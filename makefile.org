@@ -541,3 +541,89 @@ all:
 clean:
 	rm -rf subdir	  
 #+end_src
+
+** மேக்கில் ஏற்றுமதி, சூழல்கள் மற்றும் மீள்சுருள் (Export, Environments and Recursive make)
+
+மேக் தொடங்கும் போது, எந்த சூழல் மாறிகள்(Environment variable) நிறுவப்பட்டு உள்ளதோ அது மேக் மாறிகளாக தானாகவே உருவாக்குகிறது.
+
+#+begin_src makefile
+# இதை "export shell_env_var='I am an environment variable'; make" உடன் இயக்கவும்
+all:
+	# கூடு மாறியை(shell variable) அச்சிடவும்
+	echo $$shell_env_var
+
+	# மேக் மாறியை அச்சிடவும்
+	echo $(shell_env_var)	  
+#+end_src
+
+ஏற்றுமதி நெறியுறுத்தல்(export directive) ஒரு மாறியை எடுத்து அனைத்து தயாரிப்பு முறைகளிலும்(recipes) உள்ள அனைத்து கூடு கட்டளைகளுக்கும்(shell variable) சூழலை(environment) அமைக்கிறது:
+
+#+begin_src makefile
+shell_env_var=Shell env var, created inside of Make
+export shell_env_var
+all:
+	echo $(shell_env_var)
+	echo $$shell_env_var
+#+end_src
+
+எனவே, நீங்கள் மேக் இன் உள்ளே மேக் கட்டளையை இயக்கும் போது, ​​நீங்கள் ஏற்றுமதி நெறியுறுத்தல் பயன்படுத்தி துணை-மேக்(sub-make) கட்டளைகளை அணுகலாம். இந்த எடுத்துக்காட்டில், துணை கோப்புறை(sub directory) உள்ள மேக் கோப்பை பயன்படுத்தும் வகையில் cooly ஏற்றுமதி செய்யப்படுகிறது
+
+#+begin_src makefile
+new_contents = "hello:\n\techo \$$(cooly)"
+
+all:
+	mkdir -p subdir
+	printf $(new_contents) | sed -e 's/^ //' > subdir/makefile
+	@echo "---MAKEFILE CONTENTS---"
+	@cd subdir && cat makefile
+	@echo "---END MAKEFILE CONTENTS---"
+	cd subdir && $(MAKE)
+
+# மாறிகள் மற்றும் ஏற்றுமதிகள் என்பதை நினைவில் கொள்க. அவை பொதுவாக(globally) அமைக்கப்பட்டுள்ளன/பாதிக்கப்படுகின்றன.
+cooly = "The subdirectory can see me!"
+export cooly
+# இது மேலே உள்ள வரியை ரத்து செய்யும்: cooly ஏற்றுமதியை நீக்கவும்
+
+clean:
+	rm -rf subdir
+#+end_src
+
+கூடுகாலிலும் இயங்குவதற்கு மாறிகளை ஏற்றுமதி செய்ய வேண்டும்.
+
+#+begin_src makefile
+one=this will only work locally
+export two=we can run subcommands with this
+
+all: 
+	@echo $(one)
+	@echo $$one
+	@echo $(two)
+	@echo $$two
+#+end_src
+
+.EXPORT_ALL_VARIABLES உங்களுக்கான அனைத்து மாறிகளையும் ஏற்றுமதி செய்கிறது.
+
+#+begin_src makefile
+.EXPORT_ALL_VARIABLES:
+new_contents = "hello:\n\techo \$$(cooly)"
+
+cooly = "The subdirectory can see me!"
+# இது மேலே உள்ள வரியை ரத்து செய்யும்: cooly ஏற்றுமதியை நீக்கவும்
+
+all:
+	mkdir -p subdir
+	printf $(new_contents) | sed -e 's/^ //' > subdir/makefile
+	@echo "---MAKEFILE CONTENTS---"
+	@cd subdir && cat makefile
+	@echo "---END MAKEFILE CONTENTS---"
+	cd subdir && $(MAKE)
+
+clean:
+	rm -rf subdir
+#+end_src
+
+** மேக்கின் தருமதிப்புகள்
+மேக் இருந்து இயக்கக்கூடிய விருப்பங்களின் நல்ல பட்டியல் உள்ளது. --dry-run, --touch, --old-file ஐ பார்க்கவும்.
+
+நீங்கள் மேக் மூலம் பல இலக்குகளை இயக்கலாம் i.e make clean run test அது clean முதலில் பின் run பின் test யை செயல்படுத்தும்
+
