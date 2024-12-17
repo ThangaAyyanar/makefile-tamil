@@ -181,7 +181,7 @@ file2:
 clean:
 	rm -f file1 file2 some_file	  
 #+end_src
-ஒற்றை அல்லது இரட்டை மேற்கோள்களுக்கு(quotes) அர்த்தம் இல்லை மேக்கில். அவை வெறுமனே மாறிக்கு ஒதுக்கப்பட்ட எழுத்துக்கள். மேற்கோள்கள் ஷெல்(shell)/பாஷுக்கு(Bash) பயனுள்ளதாக இருக்கும், மேலும் அவை உங்களுக்கு printf போன்ற கட்டளைகளில் தேவைப்படும். இந்த எடுத்துக்காட்டில், இரண்டு கட்டளைகளும் ஒரே மாதிரியாக செயல்படுகின்றன:
+ஒற்றை அல்லது இரட்டை மேற்கோள்களுக்கு(quotes) அர்த்தம் இல்லை மேக்கில். அவை வெறுமனே மாறிக்கு ஒதுக்கப்பட்ட எழுத்துக்கள். மேற்கோள்கள் கூடு(shell)/பாஷுக்கு(Bash) பயனுள்ளதாக இருக்கும், மேலும் அவை உங்களுக்கு printf போன்ற கட்டளைகளில் தேவைப்படும். இந்த எடுத்துக்காட்டில், இரண்டு கட்டளைகளும் ஒரே மாதிரியாக செயல்படுகின்றன:
 #+begin_src makefile
 a := one two # a ஆனது "one two" என்ற சரத்திற்கு அமைக்கப்பட்டுள்ளது
 b := 'one two' # பரிந்துரைக்கப்படவில்லை. b ஆனது "'one two'" சரத்திற்கு அமைக்கப்பட்டுள்ளது
@@ -279,7 +279,7 @@ four: $(wildcard *.o)
 - நிலையான வடிவ விதிகள் (Static Pattern Matching)
 - வடிவ விதிகள் (Pattern matching)
 - சரம் மாற்று (String Subtitution)
-- vpath உத்தரவு (The vpath directive)
+- vpath நெறியுறுத்தம் (The vpath directive)
 
 ** தானியங்கி மாறிகள் (Automatic variable)
 பல தானியங்கி மாறிகள் உள்ளன, ஆனால் பெரும்பாலும் சில மட்டுமே காண்பிக்கப்படுகின்றன:
@@ -471,7 +471,7 @@ all:
 	echo "But this will"	 
 #+end_src
 ** கட்டளை செயல்படுத்தல் (Command Execution)
-ஒவ்வொரு கட்டளையும் ஒரு புதிய ஷெல்லில்(shell) இயக்கப்படுகிறது (அல்லது குறைந்த பட்சம் விளைவு இப்படி இருக்கும்)
+ஒவ்வொரு கட்டளையும் ஒரு புதிய கூடுகலில்(shell) இயக்கப்படுகிறது (அல்லது குறைந்த பட்சம் விளைவு இப்படி இருக்கும்)
 #+begin_src makefile
 all: 
 	cd ..
@@ -556,7 +556,7 @@ all:
 	echo $(shell_env_var)	  
 #+end_src
 
-ஏற்றுமதி நெறியுறுத்தல்(export directive) ஒரு மாறியை எடுத்து அனைத்து தயாரிப்பு முறைகளிலும்(recipes) உள்ள அனைத்து கூடு கட்டளைகளுக்கும்(shell variable) சூழலை(environment) அமைக்கிறது:
+ஏற்றுமதி நெறியுறுத்தம்(export directive) ஒரு மாறியை எடுத்து அனைத்து தயாரிப்பு முறைகளிலும்(recipes) உள்ள அனைத்து கூடு கட்டளைகளுக்கும்(shell variable) சூழலை(environment) அமைக்கிறது:
 
 #+begin_src makefile
 shell_env_var=Shell env var, created inside of Make
@@ -628,7 +628,7 @@ clean:
 நீங்கள் மேக் மூலம் பல இலக்குகளை இயக்கலாம் i.e make clean run test அது clean முதலில் பின் run பின் test யை செயல்படுத்தும்
 
 * மாறிகள் பகுதி 2
-** சுவைகள் மற்றும் மாற்றம்
+** சுவைகள் மற்றும் மாற்றம்(Flavors and Modifications)
 மாறிகளில் இரண்டு சுவைகள் உள்ளன:
 - மீள்சுருள்(recursive) (பயன்பாடு =) - கட்டளை பயன்படுத்தப்படும் போது மட்டுமே மாறிகளை தேடுகிறது, அது வரையறுக்கப்படும்(defined) போது அல்ல.
 - வெறுமனே விரிவாக்கப்பட்டது (பயன்படுத்தவும் :=) - சாதாரண கட்டாய நிரலாக்கத்தைப்(Imperative programmming) போல -- இதுவரை வரையறுக்கப்பட்டவை(defined) மட்டுமே விரிவாக்கப்படும்
@@ -665,3 +665,172 @@ all:
 	echo $(one)
 	echo $(two)
 #+end_src
+ஒரு வரியின் முடிவில் உள்ள இடைவெளிகள்(Spaces) அகற்றப்படவில்லை, ஆனால் தொடக்கத்தில் உள்ளவை அகற்றப்படும். ஒற்றை இடைவெளியுடன்(Single space) மாறியை உருவாக்க,$(nullstring) பயன்படுத்தவும்.
+#+begin_src makefile
+with_spaces = hello # with_spaces "hello"க்குப் பிறகு பல இடைவெளிகளைக் கொண்டுள்ளது
+after = $(with_spaces)there
+
+nullstring =
+space = $(nullstring) # ஒற்றை இடைவெளியுடன் ஒரு மாறியை உருவாக்கவும்.
+
+all: 
+	echo "$(after)"
+	echo start"$(space)"end
+#+end_src
+ஒரு வரையறுக்கப்படாத மாறி(Undefined variable) உண்மையில் ஒரு வெற்று சரம்(empty string)!
+#+begin_src makefile
+all: 
+# வரையறுக்கப்படாத மாறிகள் வெறும் வெற்று சரங்கள்!
+	echo $(nowhere)
+#+end_src
+இணைக்க += ஐப் பயன்படுத்தவும்
+#+begin_src makefile
+foo := start
+foo += more
+
+all: 
+	echo $(foo)
+#+end_src
+சரம் மாற்று(String substitution) என்பது மாறிகளை மாற்றுவதற்கான மிகவும் பொதுவான மற்றும் பயனுள்ள வழியாகும்.மேலும் உரை செயல்பாடுகள்(Text function) மற்றும் கோப்பு பெயர் செயல்பாடுகளையும்(Textfilename function) பார்க்கவும்.
+** கட்டளை வரி வாதங்கள் மற்றும் மேலாணை(Command line arguments and Override)
+மேலாணையைப் பயன்படுத்தி கட்டளை வரியிலிருந்து வரும் மாறிகளை நீங்கள் மேலாணை(override) செய்யலாம். இங்கே நாம் make option_one=hi உடன் make ஐ இயக்கினோம்
+#+begin_src makefile
+# மேலாணைகள் கட்டளை வரி வாதங்கள்
+override option_one = did_override
+# கட்டளை வரி வாதங்களுக்கு மேலாணை செய்யாது
+option_two = not_override
+all: 
+	echo $(option_one)
+	echo $(option_two)
+#+end_src
+
+** கட்டளைகளின் பட்டியல் மற்றும் வரையறு (List of commands and define)
+
+வரையறு நெறியுறுத்தம்(define directive) ஒரு செயல்பாடு அல்ல, அது அப்படித் தோன்றினாலும். இது மிகவும் அரிதாகவே பயன்படுத்தப்படுவதை நான் பார்த்திருக்கிறேன், நான் விவரங்களுக்குச் செல்லமாட்டேன், ஆனால் இது முக்கியமாக பதிவு செய்யப்பட்ட தயாரிப்பு குறிப்புகளை வரையறுக்கப் பயன்படுகிறது மற்றும் eval செயல்பாட்டுடன் நன்றாக இணைகிறது.
+
+define/endef என்பது கட்டளைகளின் பட்டியலில் அமைக்கப்பட்ட ஒரு மாறியை உருவாக்குகிறது. கட்டளைகளுக்கு இடையில் ஒரு அரைப்புள்ளி(Semicolon) இருப்பதை விட இது சற்று வித்தியாசமானது என்பதை இங்கே கவனிக்கவும், ஏனெனில் ஒவ்வொன்றும் தனித்தனி கூடுகலில்(Shell) இயங்கும்.
+
+#+begin_src makefile
+one = export blah="I was set!"; echo $$blah
+
+define two
+export blah="I was set!"
+echo $$blah
+endef
+
+all: 
+	@echo "This prints 'I was set'"
+	@$(one)
+	@echo "This does not print 'I was set' because each command runs in a separate shell"
+	@$(two)
+#+end_src
+
+** இலக்கு-குறிப்பிட்ட மாறிகள் (Target-specific variables)
+
+குறிப்பிட்ட இலக்குகளுக்கு மாறிகளை அமைக்கலாம்
+
+#+begin_src makefile
+all: one = cool
+
+all: 
+	echo one is defined: $(one)
+
+other:
+	echo one is nothing: $(one)
+#+end_src
+
+** வடிவ-குறிப்பிட்ட மாறிகள் (Pattern-specific variables)
+
+குறிப்பிட்ட இலக்கு வடிவங்களுக்கு நீங்கள் மாறிகளை அமைக்கலாம்
+
+#+begin_src makefile
+%.c: one = cool
+
+blah.c: 
+	echo one is defined: $(one)
+
+other:
+	echo one is nothing: $(one)
+#+end_src
+
+* மேக் கோப்புபின் நிபந்தனை பகுதி (Conditional part of Makefiles)
+** நிபந்தனை ஆனால்/இல்லை (Conditional if/else)
+#+begin_src makefile
+foo = ok
+
+all:
+ifeq ($(foo), ok)
+	echo "foo equals ok"
+else
+	echo "nope"
+endif
+#+end_src
+** ஒரு மாறி காலியாக உள்ளதா என சரிபார்க்க (Check if a variable is empty)
+#+begin_src makefile
+nullstring =
+foo = $(nullstring) # வரியின் முடிவு; இங்கே ஒரு இடைவெளி உள்ளது
+
+all:
+ifeq ($(strip $(foo)),)
+	echo "foo is empty after being stripped"
+endif
+ifeq ($(nullstring),)
+	echo "nullstring doesn't even have spaces"
+endif
+#+end_src
+** ஒரு மாறி வரையறுக்கப்பட்டுள்ளதா என சரிபார்க்க (Check if a variable is defined)
+ifdef மாறி குறிப்புகளை விரிவாக்காது; ஏதாவது வரையறுக்கப்பட்டுள்ளதா என்று தான் பார்க்கிறது
+#+begin_src makefile
+bar =
+foo = $(bar)
+
+all:
+ifdef foo
+	echo "foo is defined"
+endif
+ifndef bar
+	echo "but bar is not"
+endif
+#+end_src
+** $(MAKEFLAGS)
+Findstring மற்றும் MAKEFLAGS மூலம் கொடிகளை(flag) உருவாக்குவது எப்படி என்பதை இந்த எடுத்துக்காட்டு காட்டுகிறது. எதிரொலி அறிக்கையை(echo statement) அச்சிடுவதைப் பார்க்க, இந்த உதாரணத்தை make -i உடன் இயக்கவும்.
+#+begin_src makefile
+all:
+# "-i" கொடியைத் தேடுங்கள். MAKEFLAGS என்பது ஒற்றை எழுத்துகளின் பட்டியல் மட்டுமே, ஒரு கொடிக்கு ஒன்று. எனவே இந்த வழக்கில் "i" ஐத் தேடுங்கள்.
+ifneq (,$(findstring i, $(MAKEFLAGS)))
+	echo "i was passed to MAKEFLAGS"
+endif
+#+end_src
+* செயல்பாடுகள் (Functions)
+** முதல் செயல்பாடுகள் (First functions)
+செயல்பாடுகள் முக்கியமாக உரை செயலாக்கத்திற்கு(text processing) மட்டுமே. $(fn, arguments) அல்லது ${fn, arguments} உடன் செயல்பாடுகளை அழைக்கவும். மேக் ஒரு நல்ல அளவு உள்ளமைந்த செயல்பாடுகளைக்(Builtin Functions) கொண்டுள்ளது.
+#+begin_src makefile
+bar := ${subst not,"totally", "I am not superman"}
+all: 
+	@echo $(bar)
+#+end_src
+இடைவெளிகள்(space) அல்லது காற்புள்ளிகளை(commas) மாற்ற விரும்பினால், மாறிகளைப் பயன்படுத்தவும்
+#+begin_src makefile
+comma := ,
+empty:=
+space := $(empty) $(empty)
+foo := a b c
+bar := $(subst $(space),$(comma),$(foo))
+
+all: 
+	@echo $(bar)
+#+end_src
+முதல் வாதங்களுக்குப்(argument) பிறகு இடைவெளிகளைச் சேர்க்க வேண்டாம். அது சரத்தின் ஒரு பகுதியாகவே பார்க்கப்படும்.
+#+begin_src makefile
+comma := ,
+empty:=
+space := $(empty) $(empty)
+foo := a b c
+bar := $(subst $(space), $(comma) , $(foo)) # கவனியுங்கள்!
+
+all: 
+# வெளியீடு ", a , b , c" ஆகும். அறிமுகப்படுத்தப்பட்ட இடைவெளிகளைக் கவனியுங்கள்
+	@echo $(bar)
+#+end_src
+** சரம் பதிலீட்டு (String substitution)
+
