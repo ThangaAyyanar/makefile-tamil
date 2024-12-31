@@ -957,6 +957,83 @@ some_file:
 #+end_src
 
 ** .phony
+ஒரு இலக்குடன் .PHONY ஐ சேர்ப்பது, ஃபோனி(phony) இலக்கை கோப்பு(file) பெயருடன் குழப்புவதை மேக்(make) தடுக்கும். இந்த எடுத்துக்காட்டில், clean கோப்பை உருவாக்கினால், மேக் clean இலக்கு இயக்கப்படும். தொழில்நுட்ப ரீதியாக, நான் அதை ஒவ்வொரு உதாரணத்திலும் all அல்லது clean பயன்படுத்தியிருக்க வேண்டும், ஆனால் உதாரணங்களை சுத்தமாக வைத்திருக்க விரும்புகிறேன். கூடுதலாக, "ஃபோனி" இலக்குகள் பொதுவாக அரிதாகவே கோப்பு பெயர்களாக இருக்கும் பெயர்களைக் கொண்டுள்ளன, மேலும் நடைமுறையில் பலர் இதைத் தவிர்க்கிறார்கள்.
+#+begin_src makefile
+some_file:
+	touch some_file
+	touch clean
+
+.PHONY: clean
+clean:
+	rm -f some_file
+	rm -f clean
+#+end_src
+
+** .delete_on_error
+ஒரு கட்டளை பூஜ்ஜியமற்ற வெளியேறும் நிலையை(nonzero exit status) அளித்தால், மேக் கருவி ஒரு விதியை இயக்குவதை நிறுத்திவிடும் (மேலும் முன்நிபந்தனைகளுக்குத் திரும்பச் செல்லும்). இந்த முறையில் விதி தோல்வியுற்றால், DELETE_ON_ERROR விதியின் இலக்கை நீக்கும். ஃபோனி(PHONY) போன்று முன்பு இருந்த இலக்குகளுக்கு மட்டுமல்ல, எல்லா இலக்குகளுக்கும் இது நடக்கும். இதை எப்போதும் பயன்படுத்துவது நல்லது, வரலாற்று காரணங்களால் மேக் அதை செய்யவில்லை என்றாலும்.
+#+begin_src makefile
+.DELETE_ON_ERROR:
+all: one two
+
+one:
+	touch one
+	false
+
+two:
+	touch two
+	false
+#+end_src
+
+** மேக் கோப்பு சமையல் புத்தகம்
+நடுத்தர அளவிலான திட்டங்களுக்கு நன்றாக வேலை செய்யும் ஒரு சிறந்த உதாரணத்தை உருவாக்குவோம். இந்த மேக் கோப்பு பற்றிய நேர்த்தியான விஷயம் என்னவென்றால், அது உங்களுக்கான சார்புகளை தானாகவே தீர்மானிக்கிறது. நீங்கள் செய்ய வேண்டியது உங்கள் C/C++ கோப்புகளை src/ கோப்புறையில் வைப்பதுதான்.
+#+begin_src makefile
+# நன்றி ஜாப் விரானிஷ்[Job Vranish] (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/)
+TARGET_EXEC := final_program
+
+BUILD_DIR := ./build
+SRC_DIRS := ./src
+
+# நாம் நிரல்மொழிமாற்ற விரும்பும் அனைத்து C மற்றும் C++ கோப்புகளையும் கண்டறியவும்
+# வெளிப்பாடுகளைச்(expressions) சுற்றியுள்ள ஒற்றை மேற்கோள்களைக்(single quotes) கவனியுங்கள். ஷெல் இதை தவறாக விரிவுபடுத்தும், ஆனால் நாம் * ஐ நேரடியாக find கட்டளைக்கு அனுப்ப விரும்புகிறோம்.
+SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
+
+# BUILD_DIR ஐ முன்வைத்து, ஒவ்வொரு src கோப்பிலும் .o ஐ இணைக்கிறது
+# உதாரணமாக, ./your_dir/hello.cpp ஆனது ./build/./your_dir/hello.cpp.o ஆக மாறும்
+OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+
+# சரம் மாற்று (% இல்லாமல் பின்னொட்டு(suffix) பதிப்பு).
+# உதாரணமாக, ./build/hello.cpp.o ஆனது ./build/hello.cpp.d ஆக மாறும்
+DEPS := $(OBJS:.o=.d)
+
+# ./src இல் உள்ள ஒவ்வொரு கோப்புறையும் GCC க்கு அனுப்பப்பட வேண்டும், இதனால் அது தலைப்புக் கோப்புகளைக் கண்டறிய முடியும்
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+# INC_DIRS இல் முன்னொட்டைச் சேர்க்கவும். எனவே moduleA, -ImoduleA ஆக மாறும். GCC இதைப் புரிந்துகொள்கிறது -I கொடி
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+
+# -MMD மற்றும் -MP கொடிகள் இணைந்து நமக்கான மேக் கோப்புகளை உருவாக்குகின்றன!
+# இந்த கோப்புகளில் .o க்கு பதிலாக .d வெளியீடாக இருக்கும்.
+CPPFLAGS := $(INC_FLAGS) -MMD -MP
+
+# இறுதி கட்ட படி.
+$(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
+	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
+
+# C மூலத்திற்கான படியை உருவாக்கவும்
+$(BUILD_DIR)/%.c.o: %.c
+	mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+# C++ மூலத்திற்கான படியை உருவாக்கவும்
+$(BUILD_DIR)/%.cpp.o: %.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 
-Adding .PHONY to a target will prevent Make from confusing the phony target with a file name. In this example, if the file clean is created, make clean will still be run. Technically, I should have used it in every example with all or clean, but I wanted to keep the examples clean. Additionally, "phony" targets typically have names that are rarely file names, and in practice many people skip this.
+.PHONY: clean
+clean:
+	rm -r $(BUILD_DIR)
+
+# .d மேக் கோப்பு சேர்க்க. - முன்புறம் இருப்பதால் காணாமல் போன பிழைகளை அடக்கி வைக்கிறது
+# மேக் கோப்புகள். ஆரம்பத்தில், அனைத்து .d கோப்புகளும் இருக்காது, அதனால் பிழைகள் காட்ட விரும்பவில்லை என்றதால்
+-include $(DEPS)
+#+end_src
